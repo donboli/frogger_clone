@@ -1,14 +1,14 @@
 // Enemies our player must avoid
-var Enemy = function() {
+var Enemy = function(positionY, speed) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
     // movement speed
-    this.speed = 50;
+    this.speed = speed;
 
     // position on the canvas
     this.x = 0;
-    this.y = 0;
+    this.y = positionY;
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
@@ -26,7 +26,9 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    var positionX = this.x * (ctx.canvas.width / 5);
+    var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
+    ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
 };
 
 // Now write your own player class
@@ -34,8 +36,8 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
     // position on the canvas
-    this.x = 0;
-    this.y = 2;
+    this.x = 2;
+    this.y = 5;
 
     // char-boy image for player
     this.sprite = 'images/char-boy.png';
@@ -43,22 +45,23 @@ var Player = function() {
 
 Player.prototype.update = function() {
     // detect collision
+    // points?
 };
 
 Player.prototype.render = function() {
-    positionX = this.x * (ctx.canvas.width / 5);
-    positionY = this.y * (ctx.canvas.height / 6);
+    var positionX = this.x * (ctx.canvas.width / 5);
+    var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
     ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
 };
 
 Player.prototype.handleInput = function(key) {
-    if (key == 'left') {
+    if (key == 'left' && this.x > 0) {
         this.x--;
-    } else if (key == 'right') {
+    } else if (key == 'right' && this.x < 4) {
         this.x++;
-    } else if (key == 'up') {
+    } else if (key == 'up' && this.y > 0) {
         this.y--;
-    } else if (key == 'down') {
+    } else if (key == 'down' && this.y < 5) {
         this.y++;
     }
 };
@@ -67,7 +70,9 @@ Player.prototype.handleInput = function(key) {
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
 for (var i = 0; i < 3; i++) {
-    allEnemies.push(new Enemy());
+    var positionY = Math.round(Math.random() * 2) + 1;
+    var speed = Math.random() * 3;
+    allEnemies.push(new Enemy(positionY, speed));
 }
 
 // Place the player object in a variable called player
