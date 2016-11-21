@@ -36,21 +36,25 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
     // position on the canvas
-    this.x = 2;
-    this.y = 5;
+    this.x = 0;
+    this.y = 0;
+    this.reset();
 
     // char-boy image for player
     this.sprite = 'images/char-boy.png';
 };
 
 Player.prototype.update = function() {
+    if (this.y == 0) {
+        this.reset();
+    }
     // detect collision
     // points?
 };
 
 Player.prototype.render = function() {
     var positionX = this.x * (ctx.canvas.width / 5);
-    var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
+    var positionY = this.y * (ctx.canvas.height / 7.3) - 12;
     ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
 };
 
@@ -65,6 +69,11 @@ Player.prototype.handleInput = function(key) {
         this.y++;
     }
 };
+
+Player.prototype.reset = function() {
+    this.x = 2;
+    this.y = 5;
+}
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
