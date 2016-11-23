@@ -23,6 +23,7 @@ Creature.prototype.render = function() {
     var positionX = this.x * (ctx.canvas.width / 5);
     var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
     ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
+    // ctx.strokeRect(positionX + 10, positionY, 70, 70); // uncomment to visualize collision rectangle
 };
 
 
@@ -67,7 +68,6 @@ Player.prototype.update = function() {
     if (this.y == 0) {
         this.reset();
     }
-    // detect collision
     // points?
 };
 
@@ -88,7 +88,7 @@ Player.prototype.handleInput = function(key) {
 Player.prototype.reset = function() {
     this.x = 2;
     this.y = 5;
-}
+};
 
 
 // =========================================================

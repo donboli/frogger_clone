@@ -80,7 +80,29 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
+    }
+
+    // detect collisions between the player and any of the enemies
+    // uses the Axis-Aligned Bounding Box algorithm
+    function checkCollisions() {
+        var creatureSize = 70;
+
+        allEnemies.forEach(function(enemy) {
+            var playerPositionX = player.x * (ctx.canvas.width / 5) + 10;
+            var playerPositionY = player.y * (ctx.canvas.height / 7.3) - 20;
+
+            var enemyPositionX = enemy.x * (ctx.canvas.width / 5) + 10;
+            var enemyPositionY = enemy.y * (ctx.canvas.height / 7.3) - 20;
+
+            if(enemyPositionX < playerPositionX + creatureSize &&
+               enemyPositionX + creatureSize > playerPositionX &&
+               enemyPositionY < playerPositionY + creatureSize &&
+               creatureSize + enemyPositionY > playerPositionY) {
+                player.reset();
+                return;
+            }
+        });
     }
 
     /* This is called by the update function and loops through all of the
