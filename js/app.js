@@ -1,3 +1,34 @@
+// inheritance utility function
+var inherit = function(subclass, superclass) {
+    subclass.prototype = Object.create(superclass.prototype);
+    subclass.prototype.constructor = subclass;
+};
+
+
+// =========================================================
+// Creature (parent pseudoclass)
+// =========================================================
+var Creature = function(positionY, sprite) {
+    // position on the canvas
+    this.x = 0;
+    this.y = positionY;
+
+    // The image/sprite for our creatures, this uses
+    // a helper we've provided to easily load images
+    this.sprite = sprite;
+};
+
+// Draw the creature on the screen, required method for game
+Creature.prototype.render = function() {
+    var positionX = this.x * (ctx.canvas.width / 5);
+    var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
+    ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
+};
+
+
+// =========================================================
+// Enemy (child class)
+// =========================================================
 // Enemies our player must avoid
 var Enemy = function(positionY, speed) {
     // Variables applied to each of our instances go here,
@@ -6,14 +37,10 @@ var Enemy = function(positionY, speed) {
     // movement speed
     this.speed = speed;
 
-    // position on the canvas
-    this.x = 0;
-    this.y = positionY;
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
+    Creature.call(this, positionY, 'images/enemy-bug.png');
 };
+
+inherit(Enemy, Creature);
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -24,25 +51,17 @@ Enemy.prototype.update = function(dt) {
     this.x += this.speed * dt;
 };
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    var positionX = this.x * (ctx.canvas.width / 5);
-    var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
-    ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
-};
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+// =========================================================
+// Player (child class)
+// =========================================================
 var Player = function() {
-    // position on the canvas
-    this.x = 0;
-    this.y = 0;
-    this.reset();
+    Creature.call(this, 0, 'images/char-boy.png');
 
-    // char-boy image for player
-    this.sprite = 'images/char-boy.png';
+    this.reset();
 };
+
+inherit(Player, Creature);
 
 Player.prototype.update = function() {
     if (this.y == 0) {
@@ -52,12 +71,7 @@ Player.prototype.update = function() {
     // points?
 };
 
-Player.prototype.render = function() {
-    var positionX = this.x * (ctx.canvas.width / 5);
-    var positionY = this.y * (ctx.canvas.height / 7.3) - 12;
-    ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
-};
-
+// respond to keyboard events
 Player.prototype.handleInput = function(key) {
     if (key == 'left' && this.x > 0) {
         this.x--;
@@ -70,11 +84,16 @@ Player.prototype.handleInput = function(key) {
     }
 };
 
+// set initial values for player
 Player.prototype.reset = function() {
     this.x = 2;
     this.y = 5;
 }
 
+
+// =========================================================
+// Instance initialization
+// =========================================================
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
@@ -87,6 +106,10 @@ for (var i = 0; i < 3; i++) {
 // Place the player object in a variable called player
 var player = new Player();
 
+
+// =========================================================
+// Keyboard event listener
+// =========================================================
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
