@@ -99,7 +99,7 @@ var Engine = (function(global) {
                enemyPositionX + creatureSize > playerPositionX &&
                enemyPositionY < playerPositionY + creatureSize &&
                creatureSize + enemyPositionY > playerPositionY) {
-                player.reset();
+                reset();
                 return;
             }
         });
@@ -159,6 +159,7 @@ var Engine = (function(global) {
         }
 
         renderEntities();
+        renderPoints();
     }
 
     /* This function is called by the render function and is called on each game
@@ -176,12 +177,21 @@ var Engine = (function(global) {
         player.render();
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
+    // Display the amount of points the player has collected thus far.
+    function renderPoints() {
+        ctx.clearRect(0, 20, 100, 25);
+        ctx.font = "20px Georgia";
+        ctx.fillText("Points: " + player.points, 0, 40);
+    }
+
+    // Reset the points, player and all enemies.
     function reset() {
-        // noop
+        player.points = 0;
+        player.reset();
+
+        allEnemies.forEach(function(enemy) {
+            enemy.reset();
+        });
     }
 
     /* Go ahead and load all of the images we know we're going to need to

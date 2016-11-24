@@ -71,16 +71,18 @@ Enemy.prototype.update = function(dt) {
 var Player = function() {
     Creature.call(this, 0, 'images/char-boy.png');
 
+    this.points = 0;
     this.reset();
 };
 
 inherit(Player, Creature);
 
+// reset player and add point after reaching the final row (water)
 Player.prototype.update = function() {
     if (this.y == 0) {
         this.reset();
+        this.points += 1;
     }
-    // points?
 };
 
 // respond to keyboard events
