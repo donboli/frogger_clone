@@ -31,18 +31,26 @@ Creature.prototype.render = function() {
 // Enemy (child class)
 // =========================================================
 // Enemies our player must avoid
-var Enemy = function(positionY, speed) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+var Enemy = function() {
+    // inherit parent attributes
+    Creature.call(this, 0, 'images/enemy-bug.png');
 
-    // movement speed
-    this.speed = speed;
-
-    Creature.call(this, positionY, 'images/enemy-bug.png');
+    // set initial values
+    this.reset();
 };
 
 inherit(Enemy, Creature);
 
+// set initial values
+// y-axis position and speed are random
+Enemy.prototype.reset = function(dt) {
+    // position values
+    this.x = -2;
+    this.y = Math.round(Math.random() * 2) + 1;
+
+    // movement speed
+    this.speed = Math.random() * 2.5 + 1;
+};
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
@@ -50,6 +58,10 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x += this.speed * dt;
+
+    if (this.x > 5) {
+        this.reset();
+    }
 };
 
 
@@ -98,9 +110,11 @@ Player.prototype.reset = function() {
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
 for (var i = 0; i < 3; i++) {
-    var positionY = Math.round(Math.random() * 2) + 1;
-    var speed = Math.random() * 3;
-    allEnemies.push(new Enemy(positionY, speed));
+    var enemy = new Enemy();
+
+    enemy.reset();
+
+    allEnemies.push(enemy);
 }
 
 // Place the player object in a variable called player
