@@ -1,8 +1,9 @@
 # Frogger Clone
 
 ## Run the game
-The latest version of this game can be tried out [here](https://donboli.github.io/frogger_clone/).
-Otherwise copy the project and open the index.html file in your browser.
+The latest version of this game can be tried out [here](https://donboli.github.io/frogger_clone/).  
+
+Otherwise copy the project and open the index.html file in your browser.  
 Alternatively, you can also use the following commands on the project's directory:
   - node's `http-server` or
   - Python's SimpleHTTPServer, like so: `python -m SimpleHTTPServer 8080`
@@ -16,7 +17,7 @@ Get the player across all lanes and reach the water without getting hit by an en
 Use the arrow keys on your keyboard to move the player.
 
 ### Points
-You get a point for every time the water is reached. The players position resets when this happens.
+You get a point for every time the water is reached. The players position resets when this happens.  
 If the player gets hit by an enemy, he will turn back to the starting position, but also lose all accumulated points. The enemies will get resetted as well in that case.
 
 ### Lives
