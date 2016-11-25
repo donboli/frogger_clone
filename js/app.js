@@ -4,27 +4,22 @@ var inherit = function(subclass, superclass) {
     subclass.prototype.constructor = subclass;
 };
 
-// returns the second parameter if the first one is undefined
-var defaultValue = function(value, default_value) {
-    return typeof value !== "undefined" ? value : default_value;
-};
-
 
 // =========================================================
-// Creature (parent pseudoclass)
+// Entity (parent pseudoclass)
 // =========================================================
-var Creature = function(positionY, sprite) {
+var Entity = function(positionY, sprite) {
     // position on the canvas
     this.x = 0;
     this.y = positionY;
 
-    // The image/sprite for our creatures, this uses
+    // The image/sprite for our entities, this uses
     // a helper we've provided to easily load images
     this.sprite = sprite;
 };
 
-// Draw the creature on the screen, required method for game
-Creature.prototype.render = function() {
+// Draw the entity on the screen, required method for game
+Entity.prototype.render = function() {
     var positionX = this.x * (ctx.canvas.width / 5);
     var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
     ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
@@ -33,16 +28,17 @@ Creature.prototype.render = function() {
     // ctx.strokeRect(positionX + 10, positionY, 70, 70);
 };
 
+
 // =========================================================
 // Collectible (class)
 // =========================================================
-var Collectible = function(positionX, positionY) {
-    this.x = defaultValue(positionX, Math.round(Math.random() * 4));
-    this.y = defaultValue(positionY, Math.round(Math.random() * 2) + 1);
-    this.sprite = 'images/Heart.png';
+var Collectible = function() {
+    Entity.call(this, 0, 'images/Heart.png');
 
     this.reset();
 };
+
+inherit(Collectible, Entity);
 
 Collectible.prototype.update = function(dt) {
     this.time -= dt;
@@ -59,9 +55,8 @@ Collectible.prototype.update = function(dt) {
 
 Collectible.prototype.render = function() {
     if (this.placed) {
-        var positionX = this.x * (ctx.canvas.width / 5);
-        var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
-        ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
+        // use the parent's render method
+        Entity.prototype.render.call(this);
     }
 };
 
@@ -83,13 +78,13 @@ Collectible.prototype.reset = function() {
 // Enemies our player must avoid
 var Enemy = function() {
     // inherit parent attributes
-    Creature.call(this, 0, 'images/enemy-bug.png');
+    Entity.call(this, 0, 'images/enemy-bug.png');
 
     // set initial values
     this.reset();
 };
 
-inherit(Enemy, Creature);
+inherit(Enemy, Entity);
 
 // set initial values
 // y-axis position and speed are random
@@ -119,7 +114,7 @@ Enemy.prototype.update = function(dt) {
 // Player (child class)
 // =========================================================
 var Player = function() {
-    Creature.call(this, 0, 'images/char-boy.png');
+    Entity.call(this, 0, 'images/char-boy.png');
 
     this.points = 0;
 
@@ -128,7 +123,7 @@ var Player = function() {
     this.reset();
 };
 
-inherit(Player, Creature);
+inherit(Player, Entity);
 
 // reset player and add point after reaching the final row (water)
 Player.prototype.update = function() {
