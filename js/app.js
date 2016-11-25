@@ -4,6 +4,11 @@ var inherit = function(subclass, superclass) {
     subclass.prototype.constructor = subclass;
 };
 
+// returns the second parameter if the first one is undefined
+var defaultValue = function(value, default_value) {
+    return typeof value !== "undefined" ? value : default_value;
+};
+
 
 // =========================================================
 // Creature (parent pseudoclass)
@@ -23,7 +28,52 @@ Creature.prototype.render = function() {
     var positionX = this.x * (ctx.canvas.width / 5);
     var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
     ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
-    // ctx.strokeRect(positionX + 10, positionY, 70, 70); // uncomment to visualize collision rectangle
+
+    // uncomment the line below to visualize collision rectangles
+    // ctx.strokeRect(positionX + 10, positionY, 70, 70);
+};
+
+// =========================================================
+// Collectible (class)
+// =========================================================
+var Collectible = function(positionX, positionY) {
+    this.x = defaultValue(positionX, Math.round(Math.random() * 4));
+    this.y = defaultValue(positionY, Math.round(Math.random() * 2) + 1);
+    this.sprite = 'images/Heart.png';
+
+    this.reset();
+};
+
+Collectible.prototype.update = function(dt) {
+    this.time -= dt;
+
+    if (this.time < 0) {
+        this.placed = !this.placed;
+        if (this.placed) {
+            this.time = 5; // collectible will be available for 5 seconds
+        } else {
+            this.time = 10; // collectible will be off for 10 seconds
+        }
+    }
+};
+
+Collectible.prototype.render = function() {
+    if (this.placed) {
+        var positionX = this.x * (ctx.canvas.width / 5);
+        var positionY = this.y * (ctx.canvas.height / 7.3) - 20;
+        ctx.drawImage(Resources.get(this.sprite), positionX, positionY);
+    }
+};
+
+// set initial values
+Collectible.prototype.reset = function() {
+    // time (in seconds) to switch the placed flag
+    this.time = 10;
+    // determines if the collectible should be available on the game field
+    this.placed = false;
+    // randomly set a position
+    this.x = Math.round(Math.random() * 4);
+    this.y = Math.round(Math.random() * 2) + 1;
 };
 
 
@@ -72,6 +122,9 @@ var Player = function() {
     Creature.call(this, 0, 'images/char-boy.png');
 
     this.points = 0;
+
+    // number of tries left until the points are set to 0
+    this.lives = 0;
     this.reset();
 };
 
@@ -121,6 +174,9 @@ for (var i = 0; i < 3; i++) {
 
 // Place the player object in a variable called player
 var player = new Player();
+
+// initialize collectible
+var collectible = new Collectible();
 
 
 // =========================================================

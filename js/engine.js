@@ -23,6 +23,7 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
+        globalEntitySize = 70,
         lastTime;
 
     canvas.width = 505;
@@ -64,7 +65,10 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        reset();
+        // set text font
+        ctx.font = "20px Georgia";
+
+        resetGame();
         lastTime = Date.now();
         main();
     }
@@ -83,26 +87,47 @@ var Engine = (function(global) {
         checkCollisions();
     }
 
-    // detect collisions between the player and any of the enemies
+    // detect collisions between the player and other entities
     // uses the Axis-Aligned Bounding Box algorithm
     function checkCollisions() {
-        var creatureSize = 70;
-
+        // check for collisions with enemies
         allEnemies.forEach(function(enemy) {
-            var playerPositionX = player.x * (ctx.canvas.width / 5) + 10;
-            var playerPositionY = player.y * (ctx.canvas.height / 7.3) - 20;
-
-            var enemyPositionX = enemy.x * (ctx.canvas.width / 5) + 10;
-            var enemyPositionY = enemy.y * (ctx.canvas.height / 7.3) - 20;
-
-            if(enemyPositionX < playerPositionX + creatureSize &&
-               enemyPositionX + creatureSize > playerPositionX &&
-               enemyPositionY < playerPositionY + creatureSize &&
-               creatureSize + enemyPositionY > playerPositionY) {
-                reset();
-                return;
-            }
+            checkEntityCollidesWithPlayer(enemy, function() {
+                if (player.lives > 0) {
+                    player.lives--;
+                    player.reset();
+                } else {
+                    resetGame();
+                }
+            });
         });
+
+        // check for collisions with the collectible
+        if (collectible.placed) {
+            checkEntityCollidesWithPlayer(collectible, function() {
+                collectible.reset();
+                player.lives++;
+            });
+        }
+    }
+
+    /*
+     * Checks if the given entity collides with the player.
+     * Calls the collisionCallback function if a collision happens.
+     */
+    function checkEntityCollidesWithPlayer(entity, collisionCallback) {
+        var playerPositionX = player.x * (ctx.canvas.width / 5) + 10;
+        var playerPositionY = player.y * (ctx.canvas.height / 7.3) - 20;
+
+        var entityPositionX = entity.x * (ctx.canvas.width / 5) + 10;
+        var entityPositionY = entity.y * (ctx.canvas.height / 7.3) - 20;
+
+        if(entityPositionX < playerPositionX + globalEntitySize &&
+           entityPositionX + globalEntitySize > playerPositionX &&
+           entityPositionY < playerPositionY + globalEntitySize &&
+           globalEntitySize + entityPositionY > playerPositionY) {
+            collisionCallback();
+        }
     }
 
     /* This is called by the update function and loops through all of the
@@ -116,7 +141,10 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+
         player.update();
+
+        collectible.update(dt);
     }
 
     /* This function initially draws the "game level", it will then call
@@ -160,6 +188,7 @@ var Engine = (function(global) {
 
         renderEntities();
         renderPoints();
+        renderLives();
     }
 
     /* This function is called by the render function and is called on each game
@@ -175,23 +204,32 @@ var Engine = (function(global) {
         });
 
         player.render();
+
+        collectible.render();
     }
 
     // Display the amount of points the player has collected thus far.
     function renderPoints() {
         ctx.clearRect(0, 20, 100, 25);
-        ctx.font = "20px Georgia";
         ctx.fillText("Points: " + player.points, 0, 40);
     }
 
+    function renderLives() {
+        ctx.clearRect(100, 20, 100, 25);
+        ctx.fillText("Lives: " + player.lives, 110, 40);
+    }
+
     // Reset the points, player and all enemies.
-    function reset() {
+    function resetGame() {
         player.points = 0;
+        player.lives = 0;
         player.reset();
 
         allEnemies.forEach(function(enemy) {
             enemy.reset();
         });
+
+        collectible.reset();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -203,7 +241,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/Heart.png'
     ]);
     Resources.onReady(init);
 
